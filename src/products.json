@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "Signature T-Shirt",
+    "artist": "DJ Sonic",
+    "price": 25,
+    "image": "/Products/t-shart.jpg",
+    "gallery": [
+      "/Products/t-shart.jpg",
+      "/Products/hoodie.jpg",
+      "/Products/microphone.jpg",
+      "/Products/guiter.jpg"
+    ],
+    "description": "High-quality cotton t-shirt with DJ Sonic's signature. Available in all sizes."
+  },
+  {
+    "id": 2,
+    "name": "Custom Microphone",
+    "artist": "Vocal Queen",
+    "price": 120,
+    "image": "/Products/microphone.jpg",
+    "gallery": [
+      "/Products/microphone.jpg",
+      "/Products/t-shart.jpg",
+      "/Products/hoodie.jpg",
+      "/Products/guiter.jpg"
+    ],
+    "description": "Professional microphone used by Vocal Queen during her 2023 tour. Comes with a signed case."
+  },
+  {
+    "id": 3,
+    "name": "Tour Hoodie",
+    "artist": "MC Blaze",
+    "price": 40,
+    "image": "/Products/hoodie.jpg",
+    "gallery": [
+      "/Products/hoodie.jpg",
+      "/Products/t-shart.jpg",
+      "/Products/microphone.jpg",
+      "/Products/guiter.jpg"
+    ],
+    "description": "Limited edition hoodie from MC Blaze's world tour. Soft, warm, and stylish."
+  },
+  {
+    "id": 4,
+    "name": "Guitar Pick Set",
+    "artist": "Strum King",
+    "price": 15,
+    "image": "/Products/guiter.jpg",
+    "gallery": [
+      "/Products/guiter.jpg",
+      "/Products/t-shart.jpg",
+      "/Products/hoodie.jpg",
+      "/Products/microphone.jpg"
+    ],
+    "description": "Set of 5 custom guitar picks used by Strum King. Perfect for fans and musicians alike."
+  }
+] 

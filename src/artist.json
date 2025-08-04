@@ -1,0 +1,86 @@
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "image": "../public/Singer/singer1.webp",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 2,
+        "name": "John Doe",
+        "image": "../public/Singer/singer2.jpg",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 3,
+        "name": "John Doe",
+        "image": "../public/Singer/singer12.webp",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 4,
+        "name": "John Doe",
+        "image": "../public/Singer/singer11.webp",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 5,
+        "name": "John Doe",
+        "image": "../public/Singer/singer3.jpg",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 6,
+        "name": "John Doe",
+        "image": "../public/Singer/singer4.webp",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 7,
+        "name": "John Doe",
+        "image": "../public/Singer/singer5.png",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 8,
+        "name": "John Doe",
+        "image": "../public/Singer/singer6.jpg",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 9,
+        "name": "John Doe",
+        "image": "../public/Singer/singer7.webp",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 10,
+        "name": "John Doe",
+        "image": "../public/Singer/singer14.jpg",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 11,
+        "name": "John Doe",
+        "image": "../public/Singer/singer9.jpg",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    },
+    {
+        "id": 12,
+        "name": "John Doe",
+        "image": "../public/Singer/singer10.webp",
+        "followers": 1000,
+        "bio": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos."
+    }
+]
