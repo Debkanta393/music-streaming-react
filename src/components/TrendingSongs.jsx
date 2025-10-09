@@ -32,7 +32,7 @@ const firstRowSongs = songList;
         {/* First Row Song List */}
         <div
           id="trend-first-row-scroll"
-          className="flex flex-row gap-3 sm:gap-4 overflow-x-auto scroll-smooth no-scrollbar px-2 sm:px-10 w-full sm:w-[95%] mx-auto cursor-pointer"
+          className="flex flex-row gap-3 sm:gap-4 overflow-x-auto scroll-smooth no-scrollbar px-2 sm:px-10 w-full sm:w-full cursor-pointer"
           style={{
             scrollSnapType: 'x mandatory',
             scrollbarWidth: "none"
@@ -89,7 +89,7 @@ const firstRowSongs = songList;
         {/* Second Row Song List */}
         <div
           id="trend-second-row-scroll"
-          className="flex flex-row gap-3 sm:gap-4 overflow-x-auto scroll-smooth no-scrollbar px-2 sm:px-10 w-full sm:w-[95%] mx-auto cursor-pointer"
+          className="flex flex-row gap-3 sm:gap-4 overflow-x-auto scroll-smooth no-scrollbar px-2 sm:px-10 w-full sm:full cursor-pointer"
           style={{
             scrollSnapType: 'x mandatory',
             scrollbarWidth: "none"

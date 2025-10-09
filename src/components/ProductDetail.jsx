@@ -9,20 +9,14 @@ import {
   setAuthStatus
 } from '../create-slice/cart-slice';
 import { fetchMe } from '../create-slice/auth-slice';
+import { addReviews, getAllReviews } from '../create-slice/review-slice';
+import { addQNA, getAllQNA } from '../create-slice/qna-slice';
+import { FaStar } from 'react-icons/fa';
+import { toast } from "react-toastify"
 
 
 
-// Demo reviews and Q&A data
-const demoReviews = [
-  { name: 'Amit Sharma', rating: 5, date: '2024-05-01', comment: 'Amazing quality! Totally worth the price.' },
-  { name: 'Priya Singh', rating: 4, date: '2024-04-28', comment: 'Looks great and works as expected. Fast delivery.' },
-  { name: 'Rahul Verma', rating: 3, date: '2024-04-20', comment: 'Good, but packaging could be better.' },
-];
-const demoQA = [
-  { question: 'Is this product covered under warranty?', answer: 'Yes, it comes with a 1-year manufacturer warranty.' },
-  { question: 'Can I return the product if not satisfied?', answer: 'Yes, you can return within 10 days of delivery.' },
-  { question: 'Does it come in different colors?', answer: 'Currently, only the color shown is available.' },
-];
+
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -38,11 +32,20 @@ export default function ProductDetail() {
   // Get cart and auth state
   const { items: cartItems, loading: cartLoading } = useSelector(state => state.cart);
   // const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const { isAuthenticated } = useSelector(state=> state.auth)
+  const { isAuthenticated } = useSelector(state => state.auth)
   const [addedToCart, setAddedToCart] = useState({})
   const [loading, setLoading] = useState(false)
   // Set selected image
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
+  const [reviews, setReviews] = useState([])
+  const [qna, setQna] = useState([])
+  const [ratingData, setRatingData] = useState({
+    rating: 0,
+    comment: ""
+  })
+  const [question, setQuestion] = useState("")
+  const [hover, setHover] = useState(null);
 
 
 
@@ -82,7 +85,7 @@ export default function ProductDetail() {
     dispatch(setAuthStatus(!!localStorage.getItem('token')));
   }, [dispatch]);
 
-  console.log(isAuthenticated)
+
   const handleAddToCart = async (product) => {
     try {
       if (isAuthenticated) {
@@ -114,9 +117,93 @@ export default function ProductDetail() {
 
   // Buy now functionality
   const handleBuy = () => {
-    alert('Thank you for your purchase!');
-    navigate('/products');
+    if (!isAuthenticated) {
+      alert('Please login to make a purchase');
+      navigate('/login');
+      return;
+    }
+
+    const amount = selectedProduct.price * 100; // Convert to actual price (multiply by 100 as shown in the UI)
+    navigate('/payment', {
+      state: {
+        amount: amount,
+        productId: selectedProductId,
+        productName: selectedProduct.proName,
+        artistName: artistName
+      }
+    });
   };
+
+
+  // Get reviews
+
+  const handleGetReviews = async () => {
+    try {
+      const response = await dispatch(getAllReviews(id))
+      setReviews(response.payload.data.review)
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    handleGetReviews()
+  }, [])
+
+
+  // Add reviews
+  const handleAddReview = async () => {
+    try {
+      const response = await dispatch(addReviews({ id: id, data: ratingData }))
+      console.log(response)
+      if (response.payload.status == 200) {
+        setShowReviewForm(false)
+        toast.success("Your review is placed")
+        handleGetReviews()
+      }
+      else if(response.payload.status ==400){
+        setShowReviewForm(false)
+        toast.error("You already review this product")
+      }
+      setRatingData({
+        rating: 0,
+        comment: ""
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+  // Get qna
+  const handleGetQNA = async () => {
+    try {
+      const response = await dispatch(getAllQNA(id))
+      setQna(response.payload.data.message)
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    handleGetQNA()
+  }, [])
+
+
+  // Add qna
+  const handleAddQNA = async () => {
+    try {
+      const response = await dispatch(addQNA({ id: id, question: question }))
+      console.log(response)
+      if (response.payload.status == 200) {
+        setShowQuestionForm(false)
+        toast.success("Your question is placed")
+        handleGetQNA()
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
 
@@ -130,7 +217,7 @@ export default function ProductDetail() {
               {allProducts?.map((img, idx) => (
                 <img
                   key={idx}
-                  src={`http://localhost:5000/${(img.image || '').replace(/\\/g, '/')}`}
+                  src={`${fileBaseURL}/${(img.image || '').replace(/\\/g, '/')}`}
                   alt={allProducts.proName + ' thumbnail ' + (idx + 1)}
                   className={`w-14 h-14 md:w-16 md:h-16 object-cover rounded-lg border-2 cursor-pointer transition-all duration-200 ${selectedProductId === img ? 'border-[#6C63FF] shadow-lg scale-105' : 'border-gray-200 hover:border-[#00BFAE]'}`}
                   onClick={() => setSelectedProductId(img._id)}
@@ -141,7 +228,7 @@ export default function ProductDetail() {
           {/* Center: Main Image */}
           <div className="flex items-center justify-center p-4 md:p-8">
             <img
-              src={`http://localhost:5000/${(selectedProduct.image || '').replace(/\\/g, '/')}`}
+              src={`${fileBaseURL}/${(selectedProduct.image || '').replace(/\\/g, '/')}`}
               alt=""
               className="w-64 h-64 md:w-[480px] md:h-[35rem] rounded-2xl shadow-xl border-4 border-[#6C63FF]/20 object-cover bg-white"
             />
@@ -240,12 +327,12 @@ export default function ProductDetail() {
             <button onClick={() => setShowReviewForm(true)} className="bg-[#6C63FF] text-white px-4 py-2 rounded-full font-semibold shadow hover:bg-[#00BFAE] transition">Write a Review</button>
           </div>
           <div className="space-y-4">
-            {demoReviews.map((review, idx) => (
+            {reviews.map((review, idx) => (
               <div key={idx} className="bg-white/90 rounded-xl shadow p-4 flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#6C63FF]">{review.name}</span>
+                  <span className="font-bold text-[#6C63FF]">{review.user.name}</span>
                   <span className="text-yellow-400">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
-                  <span className="text-xs text-gray-400 ml-auto">{review.date}</span>
+                  <span className="text-xs text-gray-400 ml-auto">{new Date(review.createdAt).toISOString().split('T')[0]}</span>
                 </div>
                 <div className="text-gray-700">{review.comment}</div>
               </div>
@@ -255,8 +342,53 @@ export default function ProductDetail() {
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl p-8 shadow-xl w-full max-w-md">
                 <h4 className="text-lg font-bold mb-2 text-[#6C63FF]">Write a Review</h4>
-                <p className="text-gray-500 mb-4">(Demo only: form not functional)</p>
-                <button onClick={() => setShowReviewForm(false)} className="mt-2 px-4 py-2 bg-[#6C63FF] text-white rounded-full font-semibold hover:bg-[#00BFAE] transition">Close</button>
+
+                <label className='font-semibold'>Give your rating</label>
+                <div className='flex gap-1 items-center mt-2'>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRatingData((prev) => ({ ...prev, rating: star }))}
+                      onMouseEnter={() => setHover(star)}
+                      onMouseLeave={() => setHover(null)}
+                      className="focus:outline-none"
+                    >
+                      <FaStar
+                        size={28}
+                        color={(hover || ratingData.rating) >= star ? "#facc15" : "#e5e7eb"} // yellow-400 or gray-200
+                        className="transition-colors"
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                <div className='flex flex-col gap-2 mt-3'>
+                  <label htmlFor="text" className='font-semibold'>Enter your comment</label>
+                  <input
+                    type="text"
+                    placeholder='Enter your comment'
+                    className='p-2 border-gray-200 border rounded focus:outline-none focus:ring-1 focus:ring-[#6C63FF]'
+                    value={ratingData.comment}
+                    onChange={(e) => setRatingData((prev) => ({ ...prev, comment: e.target.value }))}
+                  />
+                </div>
+
+                <div className='flex flex-row gap-3 items-center justify-end mt-4'>
+                  <button
+                    type='button'
+                    onClick={handleAddReview}
+                    className="px-4 py-2 bg-[#6C63FF] text-white rounded-full font-semibold hover:bg-[#00BFAE] transition"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={() => setShowReviewForm(false)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded-full font-semibold hover:bg-gray-400 transition"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -269,7 +401,7 @@ export default function ProductDetail() {
             <button onClick={() => setShowQuestionForm(true)} className="bg-[#00BFAE] text-white px-4 py-2 rounded-full font-semibold shadow hover:bg-[#6C63FF] transition">Ask a Question</button>
           </div>
           <div className="space-y-4">
-            {demoQA.map((qa, idx) => (
+            {qna?.map((qa, idx) => (
               <div key={idx} className="bg-white/90 rounded-xl shadow p-4">
                 <div className="font-semibold text-[#6C63FF]">Q: {qa.question}</div>
                 <div className="text-gray-700 mt-1">A: {qa.answer}</div>
@@ -280,8 +412,25 @@ export default function ProductDetail() {
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl p-8 shadow-xl w-full max-w-md">
                 <h4 className="text-lg font-bold mb-2 text-[#00BFAE]">Ask a Question</h4>
-                <p className="text-gray-500 mb-4">(Demo only: form not functional)</p>
-                <button onClick={() => setShowQuestionForm(false)} className="mt-2 px-4 py-2 bg-[#00BFAE] text-white rounded-full font-semibold hover:bg-[#6C63FF] transition">Close</button>
+                <div className='flex flex-col gap-2'>
+                  <label htmlFor="text" className='font-semibold'>Ask your question</label>
+                  <input type="text" placeholder='Ask your question' className='p-2 border-gray-200 border rounded focus:outline-none focus:ring-1 focus:ring-[#6C63FF]'
+                    onChange={(e) => setQuestion(e.target.value)} />
+                </div>
+                <div className='flex flex-row gap-3 items-center justify-end mt-4'>
+                  <button
+                    onClick={handleAddQNA}
+                    className="px-4 py-2 bg-[#6C63FF] text-white rounded-full font-semibold hover:bg-[#00BFAE] transition"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={() => setShowQuestionForm(false)}
+                    className="px-4 py-2 bg-gray-300 text-black rounded-full font-semibold hover:bg-gray-400 transition"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           )}

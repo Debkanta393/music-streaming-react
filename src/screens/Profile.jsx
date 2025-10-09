@@ -7,6 +7,8 @@ import { fetchMe, updateUser } from "../create-slice/auth-slice";
 import { getAllSongOfArtist, deleteSong } from "../create-slice/song-slice";
 import { getAllProduct, deleteProduct } from "../create-slice/product-slice";
 import { toast } from 'react-toastify';
+import PaymentHistory from '../components/PaymentHistory';
+import { logout } from "../create-slice/auth-slice";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ export default function Profile() {
     email: "",
     bio: ""
   });
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
   const handleProfileChange = (e) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
@@ -70,14 +73,11 @@ export default function Profile() {
         const imageURL = URL.createObjectURL(file);
 
       } catch (error) {
-        // handle error
       }
     };
     handleUserData();
   }, []);
-  console.log(profileImage)
 
-  console.log("Profile data", profileData)
 
   // Get all song of the artist
   useEffect(() => {
@@ -113,11 +113,6 @@ export default function Profile() {
     e.preventDefault()
     console.log(profileData)
     try {
-      // const formdata=new FormData()
-      // formdata.append("name", profileData.name)
-      // formdata.append("email", profileData.email)
-      // formdata.append("bio", profileData.bio)
-
       const response = await dispatch(updateUser({ profileData, profileImage }))
       setEditProfile(false)
       console.log(response)
@@ -169,6 +164,20 @@ export default function Profile() {
       console.log(error);
     }
   };
+
+
+  // Logout
+  const handleLogout =async()=>{
+    try {
+      const response=await dispatch(logout())
+      if(response.payload){
+        toast.success("You are logged out successfully!")
+        navigate("/")
+      }
+    } catch (error) {
+      toast.error("Logout failed!")
+    }
+  }
 
   // Modal for editing profile
   const EditProfileModal = () => (
@@ -232,7 +241,7 @@ export default function Profile() {
           {/* Profile Image */}
           <div className="relative w-36 h-36 group">
             <img
-              src={previewImage ? previewImage : profileData.id ? `http://localhost:5000/uploads/${(profileImage || '')}` : userImage}
+              src={previewImage ? previewImage : profileData.id ? `${fileBaseURL}/uploads/${(profileImage || '')}` : userImage}
               alt=""
               className="w-full h-full rounded-full object-cover border-4 border-[#00f2fe]/40 shadow-lg transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl"
             />
@@ -258,12 +267,22 @@ export default function Profile() {
             <div className="flex items-center gap-4 mb-2">
               <span className="text-[#00f2fe] font-semibold">1,234 Followers</span>
             </div>
-            <button
-              className="px-6 py-2 rounded-full bg-gradient-to-r from-[#00f2fe] to-[#4facfe] text-black font-bold shadow hover:scale-105 transition w-fit mt-2 flex items-center gap-2"
-              onClick={() => setEditProfile(true)}
-            >
-              <FaEdit /> Edit Profile
-            </button>
+            <div className="flex gap-4 w-full px-4">
+              <button
+                className="px-6 py-2 rounded-full bg-gradient-to-r from-[#00f2fe] to-[#4facfe] text-black font-bold shadow hover:scale-105 
+                transition w-fit mt-2 flex items-center gap-2 hover:bg-gradient-to-r hover:from-[#4facfe] hover:to-[#00f2fe] text-md"
+                onClick={() => setEditProfile(true)}
+              >
+                <FaEdit /> Edit Profile
+              </button>
+              <button
+                className="px-4 py-2 rounded-full bg-gradient-to-r from-[#fa327e] to-[#e44343] text-black font-bold shadow 
+                hover:scale-105 transition w-fit mt-2 flex items-center gap-2 text-md hover:bg-gradient-to-r hover:from-[#e44343] hover:to-[#fa327e]"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -295,7 +314,7 @@ export default function Profile() {
                   >
                     <div className="relative w-12 h-12 flex-shrink-0">
                       <img
-                        src={`http://localhost:5000/${(song.image || "").replace(/\\/g, "/")}`}
+                        src={`${fileBaseURL}/${(song.image || "").replace(/\\/g, "/")}`}
                         alt={song.title}
                         className="w-full h-full rounded-lg object-cover border-2 border-[#00f2fe]/20 group-hover:border-[#00f2fe]/60 transition"
                       />
@@ -354,7 +373,7 @@ export default function Profile() {
                   >
                     <div className="relative w-12 h-12 flex-shrink-0">
                       <img
-                        src={`http://localhost:5000/${(product.image || "").replace(/\\/g, "/")}`}
+                        src={`${fileBaseURL}/${(product.image || "").replace(/\\/g, "/")}`}
                         alt={product.name}
                         className="w-full h-full rounded-lg object-cover border-2 border-[#4facfe]/20 group-hover:border-[#4facfe]/60 transition"
                       />
@@ -384,6 +403,17 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Payment History Section */}
+      <div className="mt-8 bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-lg border border-white/10">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="text-[#4facfe] text-xl">💳</div>
+          <h3 className="text-2xl font-bold text-[#4facfe]">Payment History</h3>
+        </div>
+        <div className="h-1 w-16 bg-gradient-to-r from-[#4facfe] to-[#00f2fe] rounded-full mb-4" />
+        <PaymentHistory />
+      </div>
+
       {/* Decorative blurred circles */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-[#00f2fe]/20 rounded-full blur-3xl -z-10 animate-pulse" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#4facfe]/20 rounded-full blur-3xl -z-10 animate-pulse" />

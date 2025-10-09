@@ -21,6 +21,7 @@ export default function EditProduct() {
   });
   const [previewImage, setPreviewImage] = useState(null);
   const imageRef = useRef();
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
 
   useEffect(() => {
     async function fetchProduct() {
@@ -40,7 +41,7 @@ export default function EditProduct() {
             image: product.image || null,
             color: [product.color] || null
           });
-          setPreviewImage(product.image ? `http://localhost:5000/${product.image.replace(/\\/g, "/")}` : null);
+          setPreviewImage(product.image ? `${fileBaseURL}/${product.image.replace(/\\/g, "/")}` : null);
         } else {
           setError("Product not found");
         }

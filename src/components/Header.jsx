@@ -44,6 +44,7 @@ export default function Header() {
 
 
   // Getting cart products
+  const { items, totalItems, totalPrice } = useSelector(state => state.cart);
   useEffect(() => {
     const handleGetCarts = async () => {
       try {
@@ -66,21 +67,6 @@ export default function Header() {
     }
     handleGetCarts()
   }, [isAuthenticated, cart])
-
-  // Handle cart number
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     // setCartNumber(totalItems)
-  //   }
-  //   else {
-  //     if (cart) {
-  //       console.log((JSON.parse(cart)).length)
-  //       setCartNumber((JSON.parse(cart)).length)
-  //     }
-  //   }
-  // }, [cart, isAuthenticated])
-  // console.log(isAuthenticated)
-  // console.log(cartNumber)
 
 
   // Performing song suggestion
@@ -121,7 +107,6 @@ export default function Header() {
     }
   };
 
-  console.log(suggestions)
 
 
 
@@ -165,9 +150,9 @@ export default function Header() {
           <div className='relative'>
             <Link to="/cart">
               <FaShoppingCart className='text-2xl sm:text-3xl text-white cursor-pointer hover:text-gray-300 transition-colors' />
-              {cartNumber > 0 && (
+              {totalItems > 0 && (
                 <span className='absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold'>
-                  {cartNumber > 99 ? '99+' : cartNumber}
+                  {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
             </Link>

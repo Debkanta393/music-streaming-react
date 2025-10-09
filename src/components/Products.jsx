@@ -11,10 +11,10 @@ export default function Products({ artistId }) {
     const navigate = useNavigate();
     const dispatch = useDispatch()
     const { songId } = useParams()
-    console.log(songId)
     // const [isAuthenticated, setIsAuthenticated] = useState(false)
     const { isAuthenticated }=useSelector(state=> state.auth)
     const [addedToCart, setAddedToCart] = useState({});
+    const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
 
 
     // Fetch user data
@@ -26,7 +26,6 @@ export default function Products({ artistId }) {
     //                 setIsAuthenticated(true)
     //             }
     //         } catch (error) {
-    //             console.log(error)
     //         }
     //     }
     //     fetchUserData()
@@ -38,7 +37,6 @@ export default function Products({ artistId }) {
         dispatch(setAuthStatus(!!localStorage.getItem('token')));
     }, [dispatch]);
 
-    console.log(isAuthenticated)
     const handleAddToCart = async (product) => {
         try {
             if (isAuthenticated) {
@@ -58,7 +56,7 @@ export default function Products({ artistId }) {
             }, 2000);
 
         } catch (error) {
-            console.log(error)
+            
         }
     };
 
@@ -70,7 +68,6 @@ export default function Products({ artistId }) {
     //         try {
     //             setLoading(true);
     //             const response = await dispatch(getSongById({ category, songId }));
-    //             console.log(response)
 
     //             if (!response.payload) throw new Error("Song not found");
 
@@ -85,7 +82,6 @@ export default function Products({ artistId }) {
 
     //     if (songId) getSongHandler();
     // }, [songId, dispatch]);
-    // console.log(songData)
     // Get all product of a auther
     // const artistId = useSelector((state) => state.song.song.artistId)
     const [products, setProducts] = useState([])
@@ -95,10 +91,9 @@ export default function Products({ artistId }) {
                 if (artistId) {
                     const response = await dispatch(getAllProduct(artistId))
                     setProducts(response.payload.products.product)
-                    console.log(response)
                 }
             } catch (error) {
-                console.log(error)
+                
             }
         }
         handleGetProduct()
@@ -136,7 +131,7 @@ export default function Products({ artistId }) {
                                 {/* IMAGE WRAPPER */}
                                 <div className="relative overflow-hidden h-96">
                                     <img
-                                        src={`http://localhost:5000/${(product.image || '').replace(/\\/g, '/')}`}
+                                        src={`${fileBaseURL}/${(product.image || '').replace(/\\/g, '/')}`}
                                         alt={product.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
                                     />

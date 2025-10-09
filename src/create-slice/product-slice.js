@@ -10,11 +10,12 @@ const initialState = {
     product: null,
     token: null
 }
+const baseURL=import.meta.env.VITE_API_URL
 
 export const uploadProduct = createAsyncThunk(
     UPLOAD_PRODUCT, async (productData, { rejectWithValue }) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/${UPLOAD_PRODUCT}`, {
+            const response = await fetch(`${baseURL}/${UPLOAD_PRODUCT}`, {
                 method: "POST",
                 body: productData,
                 credentials: 'include',
@@ -31,7 +32,7 @@ export const getAllProduct = createAsyncThunk(
     GET_ALL_PRODUCT, async (userId, { rejectWithValue }) => {
         try {
             console.log(userId)
-            const response = await axios.get(`http://localhost:5000/api/${GET_ALL_PRODUCT}/${userId}`)
+            const response = await axios.get(`${baseURL}/${GET_ALL_PRODUCT}/${userId}`)
             console.log(response)
             return response.data
         } catch (error) {
@@ -46,7 +47,7 @@ export const getProductById = createAsyncThunk(
         console.log("Get product by Id called")
         console.log(id)
         try {
-            const response = await axios.get(`http://localhost:5000/api/${PRODUCT_BY_ID}/${id}`);
+            const response = await axios.get(`${baseURL}/${PRODUCT_BY_ID}/${id}`);
             return response.data; // ✅ only return the data
         } catch (error) {
             return rejectWithValue(error.response?.data || error.message);
@@ -66,7 +67,7 @@ export const updateProduct = createAsyncThunk(
             if (data.image) formData.append("image", data.image);
             formData.append("color", data.color);
 
-            const response = await fetch(`http://localhost:5000/api/${UPDATE_PRODUCT}/${id}`, {
+            const response = await fetch(`${baseURL}/${UPDATE_PRODUCT}/${id}`, {
                 method: "PUT",
                 body: formData,
                 credentials: "include"
@@ -83,7 +84,7 @@ export const updateProduct = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
     DELETE_PRODUCT, async (proId, { rejectWithValue }) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/${DELETE_PRODUCT}/${proId}`, {
+            const response = await fetch(`${baseURL}/${DELETE_PRODUCT}/${proId}`, {
                 method: "DELETE",
                 credentials: "include"
             });

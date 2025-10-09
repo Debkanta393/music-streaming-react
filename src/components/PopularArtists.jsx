@@ -26,14 +26,14 @@ export default function PopularArtists() {
                 </button>
                 <div
                     id="artist-first-row-scroll"
-                    className="flex flex-row gap-6 sm:gap-10 overflow-x-auto scroll-smooth no-scrollbar px-2 sm:px-10 w-full sm:w-[95%] mx-auto cursor-pointer"
+                    className="flex flex-row gap-6 sm:gap-10 overflow-x-auto scroll-smooth no-scrollbar px-2 sm:px-10 w-full sm:w-full cursor-pointer"
                     style={{
                         scrollSnapType: 'x mandatory',
                         scrollbarWidth: "none"
                     }}
                 >
                     {artist.map(artist =>
-                        <div key={artist.id} className='flex justify-center items-center h-40 w-40 sm:h-48 sm:w-48 flex-shrink-0 relative group' style={{ scrollSnapAlign: 'start' }}>
+                        <div key={artist.id} className='flex justify-center items-center h-40 w-40 sm:h-48 sm:w-[15%] flex-shrink-0 relative group' style={{ scrollSnapAlign: 'start' }}>
                             <img src={artist.image.replace("../public/", "/")} alt="" className='w-full h-full object-center rounded-full hover:scale-105 transition-all duration-300' />
                         </div>
                     )}

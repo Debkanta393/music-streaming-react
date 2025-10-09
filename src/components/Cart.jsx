@@ -20,9 +20,9 @@ export default function Cart() {
     const { isAuthenticated } = useSelector(state => state.auth);
     const [updatingItem, setUpdatingItem] = useState(null);
     const [loading, setLoading] = useState(false)
-    console.log(totalItems)
-    console.log(isAuthenticated)
     const cart = localStorage.getItem("cart")
+    const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
+
     // const [isAuthenticated, setIsAuthenticated]=useState(false)
 
 
@@ -83,6 +83,8 @@ export default function Cart() {
                 await dispatch(removeFromCartAPI(productId)).unwrap();
             } else {
                 await dispatch(removeFromCartLocal(productId));
+                const remainingCart=cartItems.filter((item)=> item._id !== productId)
+                setCartItems(remainingCart)
             }
             setRemoveLoader(false)
             handleGetCartItems()
@@ -100,8 +102,10 @@ export default function Cart() {
                 if (isAuthenticated) {
                     await dispatch(clearCartAPI()).unwrap();
                 } else {
-                    dispatch(clearCartLocal());
+                    await dispatch(clearCartLocal());
                 }
+                setCartItems([])
+                handleGetCartItems()
                 setLoading(false)
             } catch (error) {
                 console.error('Error clearing cart:', error);
@@ -109,15 +113,15 @@ export default function Cart() {
             }
         }
     };
+    console.log(cartItems)
 
     const handleCheckout = () => {
-        if (!authStatus) {
+        if (!isAuthenticated) {
             alert('Please login to proceed with checkout.');
             navigate('/login');
             return;
         }
-        // Implement checkout logic here
-        alert('Checkout functionality coming soon!');
+        navigate('/checkout');
     };
 
     if (loading) {
@@ -174,12 +178,12 @@ export default function Cart() {
                         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                             <h2 className="text-xl font-bold text-white mb-6">Cart Items</h2>
                             <div className="space-y-4">
-                                {cartItems?.map((item) => (
-                                    <div key={item.productId} className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
+                                {cartItems?.map((item, index) => (
+                                    <div key={index} className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
                                         {/* Product Image */}
                                         <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                                             <img
-                                                src={`http://localhost:5000/${(item.image || '').replace(/\\/g, '/')}`}
+                                                src={`${fileBaseURL}/${(item.image || '').replace(/\\/g, '/')}`}
                                                 alt={item.proName}
                                                 className="w-full h-full object-cover"
                                             />

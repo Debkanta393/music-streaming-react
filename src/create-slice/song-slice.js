@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { UPLOAD_SONG, UPDATE_SONG, GET_ALL_SONG, SONG_BY_ID, SONG_BY_NAME, DELETE_SONG, AUTHOR_ALL_SONG, SONG_BY_TITLE } from "../apis/apis"
+import { UPLOAD_SONG, UPDATE_SONG, GET_ALL_SONG, SONG_BY_ID, SONG_BY_NAME, DELETE_SONG, AUTHOR_ALL_SONG, SONG_BY_TITLE, UPDATE_LISTEN_COUNT, UPDATE_LIKE } from "../apis/apis"
 import axios from "axios";
 
 
@@ -9,7 +9,7 @@ const initialState = {
     song: null,
     token: null
 }
-
+const baseURL = import.meta.env.VITE_API_URL
 
 export const uploadSong = createAsyncThunk(
     UPLOAD_SONG,
@@ -25,7 +25,7 @@ export const uploadSong = createAsyncThunk(
             formData.append("image", userData.coverImage); // userData.image must be a File
             formData.append("audio", userData.audioFile);
 
-            const response = await fetch(`http://localhost:5000/api/${UPLOAD_SONG}`, {
+            const response = await fetch(`${baseURL}/${UPLOAD_SONG}`, {
                 method: "POST",
                 body: formData,
                 credentials: 'include',
@@ -52,7 +52,7 @@ export const updateSong = createAsyncThunk(
             if (data.audio) formData.append("audio", data.audio);
 
             // const response = await axios.put(`http://localhost:5000/api/${UPDATE_SONG}/${id}`, data, {credentials: "include"})
-            const response = await fetch(`http://localhost:5000/api/${UPDATE_SONG}/${id}`, {
+            const response = await fetch(`${baseURL}/${UPDATE_SONG}/${id}`, {
                 method: "PUT",
                 body: formData,
                 credentials: "include"
@@ -70,7 +70,7 @@ export const getAllSong = createAsyncThunk(
     GET_ALL_SONG,
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/${GET_ALL_SONG}`)
+            const response = await axios.get(`${baseURL}/${GET_ALL_SONG}`)
             console.log(response.data)
             return response.data
         } catch (error) {
@@ -84,7 +84,7 @@ export const getSongByName = createAsyncThunk(
     async (title, { rejectWithValue }) => {
         try {
             console.log(title)
-            const response = await axios.get(`http://localhost:5000/api/${SONG_BY_NAME}/${title}`)
+            const response = await axios.get(`${baseURL}/${SONG_BY_NAME}/${title}`)
             console.log(response)
             return response
         } catch (error) {
@@ -99,7 +99,7 @@ export const searchSongsByTitle = createAsyncThunk(
     async (partialTitle, { rejectWithValue }) => {
         try {
             const encoded = encodeURIComponent(partialTitle);
-            const response = await axios.get(`http://localhost:5000/api/${SONG_BY_TITLE}/${encodeURIComponent(partialTitle)}`);
+            const response = await axios.get(`${baseURL}/${SONG_BY_TITLE}/${encodeURIComponent(partialTitle)}`);
             console.log(response)
             return response.data; // Array of song objects
         } catch (error) {
@@ -122,7 +122,7 @@ export const getSongById = createAsyncThunk(
     // }
     async ({ category, songId }, { rejectWithValue }) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/${SONG_BY_ID}/${songId}`);
+            const res = await fetch(`${baseURL}/${SONG_BY_ID}/${songId}`);
             const data = await res.json();
 
             if (!res.ok) return rejectWithValue(data.message || 'Failed to fetch song');
@@ -139,7 +139,45 @@ export const getAllSongOfArtist = createAsyncThunk(
     AUTHOR_ALL_SONG, async (authorId, { rejectWithValue }) => {
         try {
             console.log(authorId)
-            const response = await axios.get(`http://localhost:5000/api/${AUTHOR_ALL_SONG}/${authorId}`)
+            const response = await axios.get(`${baseURL}/${AUTHOR_ALL_SONG}/${authorId}`)
+            console.log(response)
+            return response.data
+        } catch (error) {
+            return rejectWithValue(error)
+        }
+    }
+)
+
+export const updateSongLike = createAsyncThunk(
+  UPDATE_LIKE,
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${baseURL}/${UPDATE_LIKE}/${id}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return rejectWithValue(errorData);
+      }
+
+      const data = await response.json(); // ✅ Parse JSON
+      return data; // ✅ Return it so it becomes the payload
+    } catch (error) {
+      return rejectWithValue(error.message || "Something went wrong");
+    }
+  }
+);
+
+
+
+
+export const updateListenCount = createAsyncThunk(
+    UPDATE_LISTEN_COUNT, async (id, { rejectWithValue }) => {
+        try {
+            console.log(id)
+            const response = await axios.put(`${baseURL}/${UPDATE_LISTEN_COUNT}/${id}`)
             console.log(response)
             return response.data
         } catch (error) {
@@ -168,7 +206,7 @@ export const deleteSong = createAsyncThunk(
             // const response = await axios.delete(`http://localhost:5000/api/${DELETE_SONG}/${songId}`, {
             //     credentials: 'include'
             // })
-            const response = await fetch(`http://localhost:5000/api/${DELETE_SONG}/${songId}`, {
+            const response = await fetch(`${baseURL}/${DELETE_SONG}/${songId}`, {
                 method: "DELETE",
                 credentials: 'include',
             })
@@ -281,6 +319,34 @@ const songSlice = createSlice({
                 state.loading = false
             })
             .addCase(getSongById.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+            builder
+            .addCase(updateSongLike.pending, (state) => {
+                state.error = null,
+                    state.loading = true
+            })
+            .addCase(updateSongLike.fulfilled, (state, action) => {
+                state.error = null
+                state.song = action.payload
+                state.loading = false
+            })
+            .addCase(updateSongLike.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload
+            })
+        builder
+            .addCase(updateListenCount.pending, (state) => {
+                state.error = null,
+                    state.loading = true
+            })
+            .addCase(updateListenCount.fulfilled, (state, action) => {
+                state.error = null
+                state.song = action.payload
+                state.loading = false
+            })
+            .addCase(updateListenCount.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload
             })

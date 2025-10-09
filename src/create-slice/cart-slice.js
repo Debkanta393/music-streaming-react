@@ -11,7 +11,7 @@ const initialState = {
     error: null,
     isAuthenticated: false
 };
-
+const baseURL=import.meta.env.VITE_API_URL
 
 
 // Async thunks for authenticated users
@@ -19,7 +19,7 @@ export const addToCartAPI = createAsyncThunk(
     CART_ADD,
     async ({ productId, quantity = 1 }, { rejectWithValue }) => {
         try {
-            const response = await axios.post(`http://localhost:5000/api/${CART_ADD}`, {
+            const response = await axios.post(`${baseURL}/${CART_ADD}`, {
                 productId,
                 quantity
             }, {
@@ -36,7 +36,7 @@ export const getCartItemsAPI = createAsyncThunk(
     CART_GET,
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/${CART_GET}`, {
+            const response = await axios.get(`${baseURL}/${CART_GET}`, {
                 withCredentials: true
             });
             return response.data;
@@ -50,7 +50,7 @@ export const updateCartItemAPI = createAsyncThunk(
     CART_UPDATE,
     async ({ productId, quantity }, { rejectWithValue }) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/${CART_UPDATE}`, {
+            const response = await axios.put(`${baseURL}/${CART_UPDATE}`, {
                 productId,
                 quantity
             }, {
@@ -68,7 +68,7 @@ export const removeFromCartAPI = createAsyncThunk(
     async (productId, { rejectWithValue }) => {
         try {
             console.log(productId)
-            const response = await axios.delete(`http://localhost:5000/api/${CART_REMOVE}/${productId}`, {
+            const response = await axios.delete(`${baseURL}/${CART_REMOVE}/${productId}`, {
                 withCredentials: true
             });
             console.log(response)
@@ -83,7 +83,7 @@ export const clearCartAPI = createAsyncThunk(
     CART_CLEAR,
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.delete(`http://localhost:5000/api/${CART_CLEAR}`, {
+            const response = await axios.delete(`${baseURL}/${CART_CLEAR}`, {
                 withCredentials: true
             });
             return response.data;
@@ -97,7 +97,7 @@ export const getCartCountAPI = createAsyncThunk(
     CART_COUNT,
     async (_, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/${CART_COUNT}`, {
+            const response = await axios.get(`${baseURL}/${CART_COUNT}`, {
                 withCredentials: true
             });
             return response.data;

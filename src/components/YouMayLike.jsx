@@ -14,6 +14,7 @@ export default function YouMayLike({ artistId }) {
   const navigate=useNavigate()
   // const artistId = useSelector((state) => state.song.song.artistId)
   const [hasFetched, setHasFetched] = useState(false);
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
 
   const scrollRow = (rowId, direction) => {
     const container = document.getElementById(rowId);
@@ -27,22 +28,16 @@ export default function YouMayLike({ artistId }) {
   };
 
 
-  console.log(artistId)
   useEffect(() => {
     //if (!artistId || hasFetched || songs.length > 0) return;
 
     const handleGetSongs = async () => {
-      console.log("Function called");
       try {
-        console.log("Artist ID:", artistId);
 
         const action = await dispatch(getAllSongOfArtist(artistId));
-        console.log("Dispatched action result:", action);
 
         if (action.payload?.songs) {
-          console.log(action.payload.songs[0].songs)
           const filteredSongs = action.payload.songs[0].songs.filter((id) => id._id != songId)
-          console.log(filteredSongs)
           setSongs(filteredSongs);
           setHasFetched(true);
         } else {
@@ -55,12 +50,9 @@ export default function YouMayLike({ artistId }) {
 
     handleGetSongs();
   }, [dispatch, artistId, hasFetched, songId]);
-  console.log(songs)
 
 
 
-
-  console.log(songs)
   return (
     <div className="w-full space-y-8">
       {/* First Row */}
@@ -100,7 +92,7 @@ export default function YouMayLike({ artistId }) {
             >
               <div className="relative group/image"> {/* local group just for image + icon */}
                 <img
-                  src={`http://localhost:5000/${(song.image || '').replace(/\\/g, '/')}`}
+                  src={`${fileBaseURL}/${(song.image || '').replace(/\\/g, '/')}`}
                   alt={song.title}
                   className="w-full h-[200px] sm:h-[170px] object-cover rounded-md group-hover/image:scale-105 transition-all duration-300
                   bg-black/60 group-hover/image:bg-black/80"

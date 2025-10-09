@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import RecomendedSongs from '../components/RecomendedSongs'
 import TrendingSongs from '../components/TrendingSongs'
 import PopularArtists from '../components/PopularArtists'
@@ -26,16 +26,19 @@ import {
   FaMobile,
   FaDesktop,
   FaTablet,
+  FaPauseCircle
 } from "react-icons/fa";
+import { useDispatch } from 'react-redux';
+import { getAllSong } from '../create-slice/song-slice';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const token = localStorage.getItem("token")
-
-  const handleBecomeArtist = () => {
-    // Add navigation or modal logic here
-  }
+  const navigate = useNavigate()
+  const songListRef = useRef(null);
 
   const handleGetStarted = () => {
+    songListRef.current?.scrollIntoView({ behavior: "smooth" });
     // Add navigation logic here
   }
 
@@ -106,6 +109,65 @@ export default function Home() {
     }
   ]
 
+  // Get all song
+  const dispatch = useDispatch();
+  const [songData, setSongData] = useState({
+    title: "",
+    artist: "",
+    audio: null,
+    image: null
+  });
+  const [hasFetched, setHasFetched] = useState(false);
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
+
+  useEffect(() => {
+    if (hasFetched) return;
+
+    const fetchSongs = async () => {
+      try {
+        const action = await dispatch(getAllSong());
+        console.log(action)
+        if (action.payload && action.payload?.songs) {
+          const artistNumber = Math.floor(Math.random() * action.payload?.songs?.length);
+          const songNumber = Math.floor(Math.random() * action.payload?.songs[artistNumber].songs.length);
+          const songData = action.payload.songs[artistNumber].songs[songNumber]
+          console.log(songData)
+          setSongData({
+            artist: action.payload.songs[artistNumber].artist.name,
+            title: action.payload.songs[artistNumber].songs[songNumber].title,
+            audio: action.payload.songs[artistNumber].songs[songNumber].audio,
+            image: action.payload.songs[artistNumber].songs[songNumber].image
+          })
+          //setSongs(songData);
+          setHasFetched(true); // ✅ prevent re-fetch
+        }
+      } catch (error) {
+        console.log("Error fetching songs:", error);
+      }
+    };
+
+    fetchSongs();
+  }, [dispatch, hasFetched]);
+
+
+  // Audio control
+  const audioRef = useRef()
+  const [isPlaying, setIsPlaying] = useState(false)
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [isPlaying]);
+
+  // Audio play/pause
+  const handlePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
   return (
     <div className='p-0 m-0 min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#16213e] overflow-x-hidden'>
       {/* Hero Section */}
@@ -146,7 +208,7 @@ export default function Home() {
             </button>
             <button
               className="flex items-center gap-3 px-8 py-4 text-white border-2 border-[#00f2fe] text-xl rounded-full font-bold hover:bg-[#00f2fe]/10 transition-all duration-300"
-              onClick={handleBecomeArtist}
+              onClick={() => navigate("/become-artist")}
             >
               <CiMicrophoneOn className='text-2xl' /> Become an Artist
             </button>
@@ -167,16 +229,31 @@ export default function Home() {
         <div className="absolute top-1/10 right-10 hidden lg:block animate-float">
           <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 shadow-2xl">
             <div className="flex items-center gap-4 mb-4">
-              <img src="/Songs/songs1.jpg" alt="Now Playing" className="w-16 h-16 rounded-2xl object-cover" />
+              <img src={`${fileBaseURL}/${(songData.image || '').replace(/\\/g, '/')}`} alt="Now Playing" className="w-16 h-16 rounded-2xl object-cover" />
               <div>
                 <h4 className="text-white font-bold">Now Playing</h4>
-                <p className="text-white/70 text-sm">Dream High - Ariana Melody</p>
+                <p className="text-white/70 text-sm">{songData.title.substring(0, 10)}... -
+                  {songData.artist.split(" ")[0] > 10 ? songData.artist.split(" ")[0].substring(0, 10) : songData.artist.split(" ")[0]}</p>
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <button className="w-12 h-12 bg-[#00f2fe] rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                <FaPlayCircle className="text-white text-lg" />
+              <button className="w-12 h-12 bg-[#00f2fe] rounded-full flex items-center justify-center hover:scale-110 transition-transform cursor-pointer"
+                onClick={handlePlayPause}>
+                {isPlaying ?
+                  <FaPauseCircle className='text-white text-lg' />
+                  :
+                  <FaPlayCircle className="text-white text-lg" />
+                }
               </button>
+              <audio
+                ref={audioRef}
+                src={`${fileBaseURL}/${songData.audio}`}
+                onEnded={() => setIsPlaying(false)}
+                style={{ display: 'none' }}
+                controls
+                controlsList="nodownload noplaybackrate"
+                onContextMenu={(e) => e.preventDefault()}
+              />
               <div className="flex gap-2">
                 <button className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-[#00f2fe]/20 transition-colors">
                   <FaHeart className="text-white text-sm" />
@@ -356,7 +433,7 @@ export default function Home() {
       <div className="w-full py-20 px-4 bg-gradient-to-r from-[#1a1a2e]/60 to-[#16213e]/60">
         <div className="max-w-7xl mx-auto space-y-16">
           {/* Recently Played */}
-          <div className='space-y-6'>
+          <div className='space-y-6' ref={songListRef}>
             <div className="flex items-center justify-between">
               <h2 className='text-3xl md:text-4xl font-bold text-white'>Recently Played</h2>
               <button className="text-[#00f2fe] hover:text-[#4facfe] transition-colors flex items-center gap-2 group">
@@ -383,7 +460,7 @@ export default function Home() {
           <div className='space-y-6'>
             <div className="flex items-center justify-between">
               <h2 className='text-3xl md:text-4xl font-bold text-white'>Popular Artists</h2>
-              <button className="text-[#00f2fe] hover:text-[#4facfe] transition-colors flex items-center gap-2 group">
+              <button className="text-[#00f2fe] hover:text-[#4facfe] transition-colors flex items-center gap-2 group" onClick={()=> navigate("/artists")}>
                 View All
                 <FaPlayCircle className="group-hover:scale-110 transition-transform" />
               </button>

@@ -7,8 +7,7 @@ import { useNavigate } from "react-router-dom"
 
 export default function RecomendedSongs() {
   // Create two separate song lists for the two rows
-  const firstRowSongs = songList;
-  const secondRowSongs = songList;
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
 
   const scrollRow = (rowId, direction) => {
     const container = document.getElementById(rowId);
@@ -53,7 +52,7 @@ export default function RecomendedSongs() {
       {/* First Row */}
       <div className="relative">
         {/* Left Arrow for First Row */}
-        <div className='flex flex-row gap-6 items-center mx-auto absolute -top-10 right-10'>
+        <div className='flex flex-row gap-6 items-center mx-auto absolute -top-10 md:right-10 right-0'>
           <button
             className="hover:bg-black/50  hover:text-white rounded-full p-2 disabled:opacity-30 cursor-pointer text-white"
             onClick={() => scrollRow('rec-first-row-scroll', 'left')}
@@ -72,7 +71,7 @@ export default function RecomendedSongs() {
         {/* First Row Song List */}
         <div
           id="rec-first-row-scroll"
-          className="flex flex-row gap-3 sm:gap-4 overflow-x-auto scroll-smooth no-scrollbar w-full sm:w-[95%] mx-auto cursor-pointer min-w-0 h-fit"
+          className="flex flex-row gap-3 sm:gap-3 overflow-x-auto scroll-smooth no-scrollbar w-full sm:w-full cursor-pointer min-w-0 h-fit"
           style={{
             scrollSnapType: 'x mandatory',
             scrollbarWidth: "none"
@@ -89,7 +88,7 @@ export default function RecomendedSongs() {
               >
                 <div className="relative group/image"> {/* local group just for image + icon */}
                   <img
-                    src={`http://localhost:5000/${(songItem.image || '').replace(/\\/g, '/')}`}
+                    src={`${fileBaseURL}/${(songItem.image || '').replace(/\\/g, '/')}`}
                     alt={songItem.title}
                     className="w-full h-[200px] sm:h-[170px] object-cover rounded-md group-hover/image:scale-105 transition-all duration-300
                   bg-black/60 group-hover/image:bg-black/80"

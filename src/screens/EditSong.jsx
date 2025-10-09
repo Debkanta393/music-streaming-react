@@ -23,6 +23,7 @@ export default function EditSong() {
   const [previewAudio, setPreviewAudio] = useState(null);
   const imageRef = useRef();
   const audioRef = useRef();
+  const fileBaseURL = import.meta.env.VITE_FILE_API_URI;
 
   useEffect(() => {
     async function fetchSong() {
@@ -40,8 +41,8 @@ export default function EditSong() {
             image: song.image,
             audio: song.audio,
           });
-          setPreviewImage(song.image ? `http://localhost:5000/${song.image.replace(/\\/g, "/")}` : null);
-          setPreviewAudio(song.audio ? `http://localhost:5000/${song.audio.replace(/\\/g, "/")}` : null);
+          setPreviewImage(song.image ? `${fileBaseURL}/${song.image.replace(/\\/g, "/")}` : null);
+          setPreviewAudio(song.audio ? `${fileBaseURL}/${song.audio.replace(/\\/g, "/")}` : null);
         } else {
           setError("Song not found");
         }

@@ -93,6 +93,11 @@ export default function Login() {
             Sign up
           </Link>
         </div>
+        <div className="text-center text-gray-600 text-sm">
+          <Link to="/forgot-password" className="text-indigo-600 hover:underline font-semibold">
+            Forgot Password?
+          </Link>
+        </div>
       </div>
       {/* Animated music bars bottom right */}
       <div className="absolute bottom-8 right-8 flex gap-1 z-0 opacity-60">
